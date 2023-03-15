@@ -16,7 +16,8 @@ function request<T>(
     .then(({ token }: Token) => {
       const options: RequestInit = {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'Access-Control-Allow-Origin': '*',
         }
       }
       return fetch(BASE_URL + url, options)
