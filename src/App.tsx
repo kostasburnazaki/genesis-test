@@ -5,6 +5,8 @@ import { Course } from './types/Course';
 import { Loader } from './components/Loader';
 import { Pagination } from './components/Pagination';
 import { Courses } from './components/Courses'
+import { Navigate, NavLink, Route, Routes, useParams } from 'react-router-dom';
+import { CourseComponent } from './components/CourseComponent';
 
 export const App = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -15,6 +17,7 @@ export const App = () => {
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse)
+
 
   useEffect(() => {
     client.getCourses()
@@ -28,32 +31,67 @@ export const App = () => {
   return (
     <>
       <header className='has-background-light'>
-        <h1 className="
-          title
-          is-size-1
-          has-text-centered
-          has-text-primary
-          py-6
-        ">
-          Courses
-        </h1>
+        <NavLink to='/home'>
+          <h1 className="
+              is-link
+              title
+              is-size-1
+              has-text-centered
+              has-text-primary
+              py-6
+            ">
+            Courses
+          </h1>
+        </NavLink>
       </header>
 
       <main className='has-background-light'>
-        {loading
-          ? <Loader />
-          : <Courses courses={currentCourses} />}
-          <Pagination
-            coursesPerPage={coursesPerPage}
-            totalCourses={courses.length}
-            paginate={setCurrentPage}
-            currentPage={currentPage}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              loading
+                ? <Loader />
+                :
+                <>
+                  <Pagination
+                    coursesPerPage={coursesPerPage}
+                    totalCourses={courses.length}
+                    paginate={setCurrentPage}
+                    currentPage={currentPage}
+                  />
+                  <Courses courses={currentCourses} />
+                  <Pagination
+                    coursesPerPage={coursesPerPage}
+                    totalCourses={courses.length}
+                    paginate={setCurrentPage}
+                    currentPage={currentPage}
+                  />
+                </>
+            }
+
           />
+
+          <Route
+            path="home"
+            element={
+              <Navigate to="/" replace />
+            }
+          />
+
+          <Route
+            path=":slug"
+            element={
+              <CourseComponent
+                courses={courses}
+              />
+            }
+          />
+        </Routes>
       </main>
 
       <footer>
       </footer>
-
     </>
   );
 };

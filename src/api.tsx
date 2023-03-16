@@ -27,4 +27,5 @@ function request<T>(
 
 export const client = {
   getCourses: () => request<Course[]>(COURSES),
+  getCourse: (id: string) => request<Course>(`${COURSES}/${id}`)
 }

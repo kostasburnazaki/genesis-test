@@ -25,7 +25,7 @@ export const Pagination: FC<Props> = ({
     pageNumbers.push(i)
   }
   return (
-      <nav className="pagination is-centered">
+      <nav className="pagination is-centered py-4">
         <ul className="pagination-list">
           {pageNumbers.map(pageNumber => (
             <li key={pageNumber}>

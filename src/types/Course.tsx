@@ -25,3 +25,20 @@ interface CourseVideoPreview {
   previewImageLink: string
 
 }
+
+export interface Lesson {
+  id: string,
+  title: string,
+  duration: number,
+  order: number,
+  type: string,
+  status: string,
+  link: string,
+  previewImageLink: string,
+  meta: null,
+}
+
+export interface DetailedCourse extends Course {
+  lessons: Lesson[],
+  containsLockedLessons: boolean
+}

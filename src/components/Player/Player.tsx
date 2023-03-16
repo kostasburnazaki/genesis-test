@@ -1,52 +1,70 @@
-import React, { FC } from "react";
-import { useRef, useState } from "react";
+import React, { FC, useRef, useEffect } from "react";
+import videojs from 'video.js';
+import '../../../node_modules/video.js/dist/video-js.css';
+
 
 type Props = {
-  url: string,
-}
+  options: {
+    muted: boolean,
+    crossorigin: boolean,
+    autoplay: boolean,
+    controls: boolean,
+    responsive: boolean,
+    fluid: boolean,
+    poster: string | boolean,
+    sources: {
+      src: string,
+      type: string,
+    }[]
+  },
+onReady: (player: any) => void,
+};
 
-export const Player: FC<Props> = ({ url }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+export const VideoJS: FC<Props> = ({ options, onReady }) => {
+  const videoRef = useRef<HTMLDivElement | null>(null);
+  const playerRef = useRef<any>(null);
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
+  useEffect(() => {
+
+    // Make sure Video.js player is only initialized once
+    if (!playerRef.current) {
+      // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode. 
+      const videoElement = document.createElement("video-js");
+
+      videoElement.classList.add('vjs-big-play-centered');
+      if (videoRef.current) {
+        videoRef.current.appendChild(videoElement);
+
+        const player = playerRef.current = videojs(videoElement, options, () => {
+          onReady && onReady(player);
+        });
       }
-      setIsPlaying(!isPlaying);
-    }
-  };
 
-  const handleProgress = () => {
-    if (videoRef.current) {
-      const duration = videoRef.current.duration;
-      const currentTime = videoRef.current.currentTime;
-      const progress = (currentTime / duration) * 100;
-      setProgress(progress);
+      // You could update an existing player in the `else` block here
+      // on prop change, for example:
+    } else {
+      const player = playerRef.current;
+
+      player.autoplay(options.autoplay);
+      player.src(options.sources);
     }
-  };
+  }, [options, videoRef, onReady]);
+
+  // Dispose the Video.js player when the functional component unmounts
+  useEffect(() => {
+    const player = playerRef.current;
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
+        playerRef.current = null;
+      }
+    };
+  }, [playerRef]);
 
   return (
-    <div>
-      <video
-        onTimeUpdate={handleProgress}
-        ref={videoRef}
-        width="100%"
-        height="100%"
-        controls
-      >
-        <source src={url} type="application/x-mpegURL" />
-      </video>
-      <div>
-        <button onClick={togglePlay}>
-          {isPlaying ? "Pause" : "Play"}
-        </button>
-        <progress value={progress} max="100" />
-      </div>
+    <div data-vjs-player>
+      <div ref={videoRef} />
     </div>
-  )
+  );
 }
