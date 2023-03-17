@@ -16,6 +16,7 @@ export const Courses: FC<Props> = ({ courses }) => {
 
     player.on("mouseover", function () {
       player.play();
+      player.playbackRate(4);
     });
     player.on("mouseleave", function () {
       player.pause();
@@ -32,9 +33,9 @@ export const Courses: FC<Props> = ({ courses }) => {
           controls: false,
           responsive: true,
           fluid: true,
-          poster: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_play_button_icon_%282013%E2%80%932017%29.svg/1200px-YouTube_play_button_icon_%282013%E2%80%932017%29.svg.png",
+          poster: false,
           sources: [{
-            src: 'https://live-par-1-abr-cdn.livepush.io/live_abr_cdn/emaIqCGoZw-6/index.m3u8',
+            src: course.meta.courseVideoPreview?.link,
             type: 'application/x-mpegURL'
           }]
         };

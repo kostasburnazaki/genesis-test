@@ -1,26 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
-import { client } from './api';
-import { Course } from './types/Course';
+import React, {
+  useEffect,
+  useState
+} from 'react';
+import {
+  Navigate,
+  NavLink,
+  Route,
+  Routes
+} from 'react-router-dom';
+
 import { Loader } from './components/Loader';
 import { Pagination } from './components/Pagination';
 import { Courses } from './components/Courses'
-import { Navigate, NavLink, Route, Routes, useParams } from 'react-router-dom';
 import { CourseComponent } from './components/CourseComponent';
+import { initValues } from './constants/initValues';
+
+import { fetchClient } from './utils/api';
+import { Course } from './types/Course';
 
 export const App = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [coursesPerPage] = useState<number>(5);
+  const [courses, setCourses] = useState<Course[]>(initValues.courses);
+  const [loadingStatus, setLoading] = useState<boolean>(initValues.loadingStatus);
+  const [currentPage, setCurrentPage] = useState<number>(initValues.currentPage);
+  const [coursesPerPage] = useState<number>(initValues.coursesPerPage);
 
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse)
 
-
   useEffect(() => {
-    client.getCourses()
+    fetchClient.getCourses()
       .then(coursesData => {
         setCourses(coursesData.courses);
         setLoading(false);
@@ -50,7 +59,7 @@ export const App = () => {
           <Route
             path="/"
             element={
-              loading
+              loadingStatus
                 ? <Loader />
                 :
                 <>
@@ -69,7 +78,6 @@ export const App = () => {
                   />
                 </>
             }
-
           />
 
           <Route
@@ -83,7 +91,7 @@ export const App = () => {
             path=":slug"
             element={
               <CourseComponent
-                courses={courses}
+                coursesData={courses}
               />
             }
           />
