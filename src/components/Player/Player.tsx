@@ -1,23 +1,12 @@
 import React, { FC, useRef, useEffect } from "react";
 import videojs from 'video.js';
 import '../../../node_modules/video.js/dist/video-js.css';
+import { JsOptions } from "../../types/VideoJSOptions";
 
 
 type Props = {
-  options: {
-    muted: boolean,
-    crossorigin: boolean,
-    autoplay: boolean,
-    controls: boolean,
-    responsive: boolean,
-    fluid: boolean,
-    poster: string | boolean,
-    sources: {
-      src: string,
-      type: string,
-    }[]
-  },
-onReady: (player: any) => void,
+  options: JsOptions,
+  onReady: (player: any) => void,
 };
 
 export const VideoJS: FC<Props> = ({ options, onReady }) => {

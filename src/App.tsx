@@ -1,12 +1,12 @@
 import React, {
   useEffect,
-  useState
+  useState,
 } from 'react';
 import {
   Navigate,
   NavLink,
   Route,
-  Routes
+  Routes,
 } from 'react-router-dom';
 
 import { Loader } from './components/Loader';
@@ -17,12 +17,12 @@ import { initValues } from './constants/initValues';
 
 import { fetchClient } from './utils/api';
 import { Course } from './types/Course';
+import { COURSES_PER_PAGE as coursesPerPage } from './constants/constValues';
 
 export const App = () => {
   const [courses, setCourses] = useState<Course[]>(initValues.courses);
-  const [loadingStatus, setLoading] = useState<boolean>(initValues.loadingStatus);
+  const [isLoading, setIsLoading] = useState<boolean>(initValues.loadingStatus);
   const [currentPage, setCurrentPage] = useState<number>(initValues.currentPage);
-  const [coursesPerPage] = useState<number>(initValues.coursesPerPage);
 
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
@@ -32,7 +32,7 @@ export const App = () => {
     fetchClient.getCourses()
       .then(coursesData => {
         setCourses(coursesData.courses);
-        setLoading(false);
+        setIsLoading(false);
       })
       .catch(err => console.warn(err))
   }, []);
@@ -59,7 +59,7 @@ export const App = () => {
           <Route
             path="/"
             element={
-              loadingStatus
+              isLoading
                 ? <Loader />
                 :
                 <>

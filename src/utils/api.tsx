@@ -8,18 +8,18 @@ const COURSES = '/core/preview-courses';
 const AUTH = '/auth/anonymous?platform=subscriptions';
 
 function handleErrors(response: any) {
-    if (!response.ok) {
-      return Promise.reject(
-        new Error(`${response.status} - ${response.statusText}`));
-    };
+  if (!response.ok) {
+    return Promise.reject(
+      new Error(`${response.status} - ${response.statusText}`));
+  };
 
-    if (!response?.headers?.get('content-type')?.includes('application/json')) {
-      return Promise.reject(
-        new Error('Content type is not supported')
-      )
-    }
-    return response.json();
+  if (!response?.headers?.get('content-type')?.includes('application/json')) {
+    return Promise.reject(
+      new Error('Content type is not supported')
+    )
   }
+  return response.json();
+}
 
 function request<T>(
   url: string,
@@ -36,6 +36,7 @@ function request<T>(
       }
       return fetch(BASE_URL + url, options)
         .then(response => {
+          console.log('response', response);
           return handleErrors(response);
         })
     })

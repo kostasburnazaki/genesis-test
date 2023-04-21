@@ -7,6 +7,7 @@ import { Course, DetailedCourse, Lesson } from "../../types/Course";
 import { VideoJS } from "../Player";
 import { initValues } from "../../constants/initValues";
 import { Loader } from "../Loader";
+import { ButtonBack } from "../ButtonBack";
 
 type Props = {
   coursesData: Course[],
@@ -17,7 +18,7 @@ export const CourseComponent: FC<Props> = ({
 }) => {
 
   const [courses, setCourses] = useState<Course[]>(coursesData)
-  const [loading, setLoading] = useState<boolean>(initValues.loadingStatus);
+  const [loading, setIsLoading] = useState<boolean>(initValues.loadingStatus);
   const [course, setCourse] = useState<DetailedCourse>();
   const { slug = '' } = useParams();
   const playerRef = useRef(null);
@@ -37,7 +38,7 @@ export const CourseComponent: FC<Props> = ({
       fetchClient.getCourse(coursePreview.id)
         .then(courseData => {
           setCourse(courseData);
-          setLoading(false);
+          setIsLoading(false);
         })
         .catch(err => console.warn(err))
     };
@@ -57,11 +58,7 @@ export const CourseComponent: FC<Props> = ({
 
   return (
     <>
-      <NavLink to='/'>
-        <button className="is-button ml-4">
-          <i className="fa-solid fa-arrow-left px-6"></i>
-        </button>
-      </NavLink>
+      <ButtonBack />
 
       {loading
         ? <Loader />

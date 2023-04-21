@@ -1,8 +1,7 @@
 import React, { FC, useRef } from "react";
-import { Course } from "../../types/Course";
-import { Skills } from "../Skills"
-import { VideoJS } from "../Player/Player";
-import { NavLink } from "react-router-dom";
+import { Course, CourseShort } from "../../types/Course";
+import { CoursePreview } from "../CoursePreview";
+import { JsOptions } from "../../types/VideoJSOptions";
 
 type Props = {
   courses: Course[],
@@ -25,8 +24,19 @@ export const Courses: FC<Props> = ({ courses }) => {
 
   return (
     <ul className='has-text-centered'>
-      {courses.map((course: Course) => {
-        const videoJsOptions = {
+      {courses.map(({
+        id,
+        title,
+        lessonsCount,
+        previewImageLink,
+        rating,
+        meta: {
+          courseVideoPreview,
+          slug,
+          skills,
+        }
+      }: Course) => {
+        const videoJsOptions: JsOptions = {
           muted: true,
           crossorigin: true,
           autoplay: false,
@@ -35,99 +45,32 @@ export const Courses: FC<Props> = ({ courses }) => {
           fluid: true,
           poster: false,
           sources: [{
-            src: course.meta.courseVideoPreview?.link,
+            src: courseVideoPreview?.link,
             type: 'application/x-mpegURL'
           }]
         };
 
+        const coursePreview: CourseShort = {
+          title,
+          lessonsCount,
+          previewImageLink,
+          rating,
+          slug,
+          skills,
+        };
+
         return (
-          <li key={course.id} className="
-          has-text-info
-          py-6
-        ">
-            <div className="container px-6">
-              <figure className='image'>
-                <img src={course.previewImageLink + '/cover.webp'} alt="" />
-              </figure>
-
-              <h2 className="
-                subtitle
-                has-text-info
-                has-text-weight-bold
-                is-uppercase
-                is-underlined
-              ">
-                {course.title}
-              </h2>
-
-              <div className="columns">
-                <div className="column">
-                  <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
-                </div>
-
-                <div className="
-                  column
-                  columns
-                  is-flex
-                  is-justify-content-space-between
-                  is-flex-direction-column
-                  ">
-                  <div className="column">
-                    <h3 className="
-                      is-size-5
-                      is-uppercase
-                      has-text-weight-semibold
-                    ">
-                      Skills to acquire:
-                    </h3>
-
-                    <Skills skills={course.meta.skills} />
-                  </div>
-
-                  <div className="column">
-                    <button className="is-button is-link">
-                      <NavLink
-                        to={`/${course.meta.slug}`}
-                      >
-                        <h2 className="
-                          subtitle
-                          has-text-info
-                          has-text-weight-bold
-                          is-capitilized
-                        ">
-                          Details
-                        </h2>
-                      </NavLink>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="
-                  column columns
-                  is-flex
-                  is-justify-content-space-between
-                  is-flex-direction-column
-                  py-6
-                ">
-                  <p className="
-                    is-size-5
-                    is-uppercase
-                    has-text-weight-semibold
-                  ">
-                    {course.lessonsCount} lessons
-                  </p>
-
-                  <p className="
-                    is-size-5
-                    is-uppercase
-                    has-text-weight-semibold
-                    is-italic
-                  ">
-                    Rating: {course.rating}
-                  </p>
-                </div>
-              </div>
-            </div>
+          <li
+            key={id}
+            className="
+              has-text-info
+              py-6
+            ">
+            <CoursePreview
+              course={coursePreview}
+              videoJsOptions={videoJsOptions}
+              handlePlayerReady={handlePlayerReady}
+            />
           </li>
         )
       })}
