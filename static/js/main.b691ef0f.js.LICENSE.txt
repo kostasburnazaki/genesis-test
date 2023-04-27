@@ -18,6 +18,8 @@
 
 /*! @name videojs-contrib-quality-levels @version 3.0.0 @license Apache-2.0 */
 
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+
 /**
  * @license
  * slighly modified parse-headers 2.0.2 <https://github.com/kesla/parse-headers/>
