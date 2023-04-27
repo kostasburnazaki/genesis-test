@@ -4,102 +4,71 @@ import React, {
 } from 'react';
 import {
   Navigate,
-  NavLink,
   Route,
   Routes,
 } from 'react-router-dom';
 
+import { Header } from './components/Header';
 import { Loader } from './components/Loader';
-import { Pagination } from './components/Pagination';
 import { Courses } from './components/Courses'
 import { CourseComponent } from './components/CourseComponent';
+
 import { initValues } from './constants/initValues';
 
+import { CoursesContext } from './utils/CoursesContext';
 import { fetchClient } from './utils/api';
+
 import { Course } from './types/Course';
-import { COURSES_PER_PAGE as coursesPerPage } from './constants/constValues';
 
 export const App = () => {
-  const [courses, setCourses] = useState<Course[]>(initValues.courses);
+  const [courses, setCourses] = useState<Course[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(initValues.loadingStatus);
-  const [currentPage, setCurrentPage] = useState<number>(initValues.currentPage);
-
-  const indexOfLastCourse = currentPage * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse)
 
   useEffect(() => {
-    fetchClient.getCourses()
-      .then(coursesData => {
-        setCourses(coursesData.courses);
-        setIsLoading(false);
-      })
+    const fetchData = async () => {
+      const { courses } = await fetchClient.getCourses();
+      setCourses(courses);
+      setIsLoading(false);
+    };
+
+    fetchData()
       .catch(err => console.warn(err))
   }, []);
 
   return (
     <>
-      <header className='has-background-light'>
-        <NavLink to='/home'>
-          <h1 className="
-              is-link
-              title
-              is-size-1
-              has-text-centered
-              has-text-primary
-              py-6
-            ">
-            Courses
-          </h1>
-        </NavLink>
-      </header>
+      <Header />
 
       <main className='has-background-light'>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isLoading
-                ? <Loader />
-                :
-                <>
-                  <Pagination
-                    coursesPerPage={coursesPerPage}
-                    totalCourses={courses.length}
-                    paginate={setCurrentPage}
-                    currentPage={currentPage}
-                  />
-                  <Courses courses={currentCourses} />
-                  <Pagination
-                    coursesPerPage={coursesPerPage}
-                    totalCourses={courses.length}
-                    paginate={setCurrentPage}
-                    currentPage={currentPage}
-                  />
-                </>
-            }
-          />
+        <CoursesContext.Provider value={{ courses }}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                isLoading
+                  ? <Loader />
+                  : (
+                    <Courses />
+                  )
+              }
+            />
 
-          <Route
-            path="home"
-            element={
-              <Navigate to="/" replace />
-            }
-          />
+            <Route
+              path="home"
+              element={
+                <Navigate to="/" replace />
+              }
+            />
 
-          <Route
-            path=":slug"
-            element={
-              <CourseComponent
-                coursesData={courses}
-              />
-            }
-          />
-        </Routes>
-      </main>
-
-      <footer>
-      </footer>
+            <Route
+              path=":slug"
+              element={
+                <CourseComponent />
+              }
+            />
+          </Routes>
+        </CoursesContext.Provider>
+      </main >
     </>
   );
 };

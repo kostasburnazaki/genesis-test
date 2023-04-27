@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useRef } from "react";
 import { VideoJS } from "../Player";
 import { Skills } from "../Skills";
 import { NavLink } from "react-router-dom";
@@ -8,7 +8,6 @@ import { JsOptions } from "../../types/VideoJSOptions";
 type Props = {
   course: CourseShort,
   videoJsOptions: JsOptions,
-  handlePlayerReady: (player: any) => void,
 }
 
 export const CoursePreview: FC<Props> = (
@@ -20,10 +19,23 @@ export const CoursePreview: FC<Props> = (
     slug,
     skills,
   },
-    videoJsOptions,
-    handlePlayerReady,
-  }
+  videoJsOptions,
+}
 ) => {
+  const playerRef = useRef(null);
+  
+  const handlePlayerReady = (player: any) => {
+    playerRef.current = player;
+
+    player.on("mouseover", function () {
+      player.play();
+      player.playbackRate(4);
+    });
+    player.on("mouseleave", function () {
+      player.pause();
+    });
+  };
+
   return (
     <div className="container px-6">
       <figure className='image'>

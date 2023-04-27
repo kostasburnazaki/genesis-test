@@ -1,47 +1,43 @@
 import classNames from "classnames";
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import { FC, useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { fetchClient } from "../../utils/api";
 import { Course, DetailedCourse, Lesson } from "../../types/Course";
 import { VideoJS } from "../Player";
+import { CoursesContext } from "../../utils/CoursesContext";
 import { initValues } from "../../constants/initValues";
 import { Loader } from "../Loader";
 import { ButtonBack } from "../ButtonBack";
+import { JsOptions } from "../../types/VideoJSOptions";
 
-type Props = {
-  coursesData: Course[],
-}
-
-export const CourseComponent: FC<Props> = ({
-  coursesData,
-}) => {
-
-  const [courses, setCourses] = useState<Course[]>(coursesData)
+export const CourseComponent: FC = () => {
   const [loading, setIsLoading] = useState<boolean>(initValues.loadingStatus);
   const [course, setCourse] = useState<DetailedCourse>();
+
+  const { courses } = useContext(CoursesContext);
+
   const { slug = '' } = useParams();
   const playerRef = useRef(null);
 
-
   useEffect(() => {
-    if (!courses.length) {
-      fetchClient.getCourses()
-        .then(coursesData => {
-          setCourses(coursesData.courses);
-        })
-    }
-
-    console.log('courses', courses);
-    const coursePreview = courses.find((course: Course) => course.meta.slug === slug);
-    if (coursePreview) {
-      fetchClient.getCourse(coursePreview.id)
-        .then(courseData => {
+    if (courses) {
+      const coursePreview = courses.find((course: Course) => course.meta.slug === slug);
+      if (coursePreview) {
+        const fetchData = async () => {
+          const courseData = await fetchClient.getCourse(coursePreview.id);
           setCourse(courseData);
           setIsLoading(false);
-        })
-        .catch(err => console.warn(err))
-    };
+        }
+        
+        fetchData()
+          .catch(err => console.warn(err))
+      } else {
+        console.warn("Course has not been found")
+      }
+    } else {
+      console.warn("Courses have not been found")
+    }
   }, [slug, courses]);
 
   const handlePlayerReady = (player: any) => {
@@ -71,7 +67,7 @@ export const CourseComponent: FC<Props> = ({
                   ? 'https://image.shutterstock.com/image-vector/lock-icon-260nw-425675884.jpg'
                   : false
 
-                const videoJsOptions = {
+                const videoJsOptions: JsOptions = {
                   muted: false,
                   crossorigin: true,
                   autoplay: false,
